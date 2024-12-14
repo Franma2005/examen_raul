@@ -7,10 +7,9 @@ import store from './src/redux/store';
 export default function App() {
   return (
     <Provider store={store}>
-      <View style={styles.container}>
+      <View>
         <HomeScreen />
-        <StatusBar style="auto" />
-     </View>
+      </View>
     </Provider>
   );
 }

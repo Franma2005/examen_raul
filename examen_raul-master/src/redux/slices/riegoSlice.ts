@@ -1,27 +1,23 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { SistemasRiego } from "../../entities/sistemasRiego";
+import { SistemasRiego, Value } from "../../entities/sistemasRiego";
 
-const initialRiegoState = { values: [] as SistemasRiego[] };
-const initialSwitchState = { switchValues: [] as boolean[] };
+export interface riego {
+    name: string,
+    values: Value[]
+}
+
+const grupos = new Array<riego>;
 
 export const riegoSlice = createSlice({
     name: 'riego',
     initialState: {
-        riego: initialRiegoState,
-        switchValues: initialSwitchState.switchValues
+        grupos
     },
     reducers: {
         setRiego: (state, action) => {
-            state.riego = action.payload;
+            state.grupos = action.payload;
         },
-        setChangeSwitch: (state, action) => {
-            const { index, newState, groupName } = action.payload;
-            const riego = state.riego.values.find((riego) => riego.name === groupName);
-            if (riego) {
-                riego.values[index].state = newState;
-            }
-        }
     }
 })
 
-export const { setRiego, setChangeSwitch } = riegoSlice.actions;
+export const { setRiego } = riegoSlice.actions;

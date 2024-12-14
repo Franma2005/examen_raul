@@ -1,37 +1,50 @@
 import React from 'react';
-import { View, Text, Switch } from 'react-native';
+import { View, Text, Switch, FlatList } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { setChangeSwitch } from '../redux/slices/riegoSlice';
 import { SistemasRiego } from '../entities/sistemasRiego';
+import { RootState } from '../redux/store';
+import { riego, setRiego } from '../redux/slices/riegoSlice';
 
 interface Props {
-    item: SistemasRiego;
+    item: riego,
+    onUpdate: (newGroups : riego[]) => void 
 }
 
-const GrupoComponent = ({ item }: Props) => {
+const GrupoComponent = ({ item , onUpdate }: Props) => {
     const dispatch = useDispatch();
-
-    // Accede a `switchValues` y `riego` desde el estado global
-    const switchValues = useSelector((state: any) => state.riego.switchValues);
+    const grupos = useSelector((state : RootState) => state.riego.grupos);
+    const handleSwitchToggle = (nombreValvula: string, currentState: boolean) => {
+        const newGroups = grupos.map(group => {
+          if (group.name === item.name) {
+            const valvulaActualizada = group.values.map(valve => 
+              valve.name === nombreValvula ? { ...valve, state: !currentState } : valve
+            );
+            return { ...group, values: valvulaActualizada };
+          }
+          return group;
+        });
+    
+        dispatch(setRiego(newGroups));
+        onUpdate(newGroups);
+      };
 
     return (
         <View>
             <Text>{item.name}</Text>
-            <Text>{item.lastDate}</Text>
-            {item.values.map((value, index) => (
-                <View key={index}>
-                    <Text>{value.name}</Text>
-                    <Switch
-                        trackColor={{ false: '#767577', true: '#81b0ff' }}
-                        thumbColor={switchValues[index] ? '#f5dd4b' : '#f4f3f4'}  // Usa `switchValues` para el color del switch
-                        onValueChange={() => {
-                            // Cambia el estado del switch en `switchValues` en base al índice
-                            dispatch(setChangeSwitch({ index, newState: !switchValues[index], itemName: item.name }));
-                        }}
-                        value={switchValues[index]}  // Usa el valor de `switchValues` correspondiente al índice
-                    />
-                </View>
-            ))}
+            <FlatList
+                data={item.values}
+                keyExtractor={(value, index) => index.toString()}
+                renderItem={({ item: value }) => (
+                    <View>
+                        <Text>{value.name}</Text>
+                        <Switch
+                            trackColor={{ false: '#767577', true: '#81b0ff' }}
+                            onValueChange={() => handleSwitchToggle(value.name, value.state)}
+                            value={value.state}
+                        />
+                    </View>
+                )}
+            />
         </View>
     );
 };

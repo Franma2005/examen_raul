@@ -2,6 +2,8 @@ import { configureStore } from '@reduxjs/toolkit';
 import { apiSlices } from './slices/apiSlices';
 import { riegoSlice } from './slices/riegoSlice';
 
+export type RootState = ReturnType<typeof store.getState>;
+
 const store = configureStore({
     reducer: {
         [ apiSlices.reducerPath ]: apiSlices.reducer,
